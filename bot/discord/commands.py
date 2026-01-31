@@ -52,8 +52,9 @@ class DiscordVoice(commands.Cog):
         os.makedirs("recordings", exist_ok=True)
 
         for user_id, audio in sink.audio_data.items():
-            with open(f"recordings/{user_id}.wav", "wb") as f:
-                f.write(audio.file.read())
+            if self.save_audio:
+                with open(f"recordings/{user_id}.wav", "wb") as f:
+                    f.write(audio.file.read())
 
         self.is_recording = False
         await ctx.send("⏹️ Nagrywanie zakończone.")
