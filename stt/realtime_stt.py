@@ -16,7 +16,7 @@ def main():
 
     whisper_engine = WhisperEngine("small")
 
-    for frame_np in wav_frames("tests/test_audio/test.wav"):
+    for frame_np in wav_frames("tests/test_audio/test_polish.wav"):
         frame = torch.from_numpy(frame_np).float()
 
         is_speech = vad.is_speech(frame_np)
