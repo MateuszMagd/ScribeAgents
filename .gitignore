@@ -1,3 +1,7 @@
+# Project specific ignores
+recordings/
+docs-temp/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
