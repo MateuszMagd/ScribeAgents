@@ -54,6 +54,7 @@ class DiscordVoice(commands.Cog):
         for user_id, audio in sink.audio_data.items():
             if self.save_audio:
                 with open(f"recordings/{user_id}.wav", "wb") as f:
+                    print(f"💾 Zapisano nagranie użytkownika {user_id} do recordings/{user_id}.wav")
                     f.write(audio.file.read())
 
         self.is_recording = False
