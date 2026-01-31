@@ -20,8 +20,8 @@ def create_discord_bot() -> commands.Bot:
     return bot
 
 
-def run_discord_bot(bot: commands.Bot):
-    setup(bot)  # ⬅️ rejestrujemy COGI
+def run_discord_bot(bot: commands.Bot, save_audio: bool):
+    setup(bot, save_audio)
 
     @bot.event
     async def on_ready():

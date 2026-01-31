@@ -5,8 +5,9 @@ import os
 import asyncio
 
 class DiscordVoice(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: commands.Bot, save_audio: bool):
         self.bot = bot
+        self.save_audio = save_audio
         self.is_recording = False
 
     @commands.command()
@@ -78,5 +79,5 @@ class DiscordVoice(commands.Cog):
         await ctx.send("👋 Bot opuścił kanał voice.")
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(DiscordVoice(bot))
+def setup(bot: commands.Bot, save_audio: bool):
+    bot.add_cog(DiscordVoice(bot, save_audio))
