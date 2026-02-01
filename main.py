@@ -1,6 +1,20 @@
+import threading
+
 from argparse import ArgumentParser
 from constants import AVAILABLE_PLATFORM_LIST
-from stt.realtime_stt import main as stt_main
+from stt.realtime_stt import run_stt
+from stt.audio_queue import audio_generator
+
+from utils.text import SaveText
+
+text_saver = SaveText("text_files/transcriptions.txt")
+
+# Temp here
+def handle_transcript(text: str):
+    print("🗣️", text)
+    text_saver.save(text)
+
+
 
 def main():
     parser = ArgumentParser(description="Command-line tool for deciding what platform you gonna run bots.")
@@ -13,11 +27,17 @@ def main():
     
     if args.platform_name == "discord":
         from bot.discord.client import create_discord_bot, run_discord_bot
+        
+        threading.Thread(
+            target=run_stt,
+            args=(audio_generator(), handle_transcript),
+            daemon=True
+        ).start()
+        
         bot = create_discord_bot()
         run_discord_bot(bot, args.save_audio)
 
 if __name__ == '__main__':
     print("Starting the application...")
-    #main()
-    stt_main()
+    main()
     print("Application finished.")

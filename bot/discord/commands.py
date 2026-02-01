@@ -1,8 +1,10 @@
-import discord
-from discord.ext import commands
-from discord.sinks import WaveSink
 import os
 import asyncio
+import discord
+from discord.ext import commands
+from discord.sinks import WaveSink # TODO: remove if not needed
+from bot.discord.sink import PCMSink
+from stt.audio_queue import audio_queue
 
 class DiscordVoice(commands.Cog):
     def __init__(self, bot: commands.Bot, save_audio: bool):
@@ -30,23 +32,19 @@ class DiscordVoice(commands.Cog):
             return
 
         await ctx.send("🎙️ Bot dołączył do kanału voice.")
-
+        
     @commands.command()
     async def record(self, ctx):
-        if self.is_recording:
-            await ctx.send("⚠️ Nagrywanie już trwa.")
-            return
-
         vc = ctx.voice_client
         if not vc:
             await ctx.send("❌ Bot nie jest na kanale voice.")
             return
 
-        sink = WaveSink()
+        sink = PCMSink()
         vc.start_recording(sink, self.finished_callback, ctx)
 
-        self.is_recording = True
-        await ctx.send("🔴 Nagrywanie rozpoczęte.")
+        await ctx.send("🎙️ Realtime STT started.")
+
 
     async def finished_callback(self, sink, ctx):
         os.makedirs("recordings", exist_ok=True)
@@ -66,7 +64,7 @@ class DiscordVoice(commands.Cog):
         if not vc or not self.is_recording:
             await ctx.send("⚠️ Bot nie nagrywa.")
             return
-
+        audio_queue.put(None)
         vc.stop_recording()
         await ctx.send("⏹️ Nagrywanie zatrzymane.")
 
