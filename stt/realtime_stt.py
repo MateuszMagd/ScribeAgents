@@ -14,9 +14,9 @@ def main():
     )
     text_saver = SaveText("transcriptions.txt")
 
-    whisper_engine = WhisperEngine("small")
+    whisper_engine = WhisperEngine("small", language="en")
 
-    for frame_np in wav_frames("tests/test_audio/test_polish.wav"):
+    for frame_np in wav_frames("tests/test_audio/test_english.wav"):
         frame = torch.from_numpy(frame_np).float()
 
         is_speech = vad.is_speech(frame_np)

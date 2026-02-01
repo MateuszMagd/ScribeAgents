@@ -18,5 +18,6 @@ def main():
 
 if __name__ == '__main__':
     print("Starting the application...")
+    #main()
     stt_main()
     print("Application finished.")
