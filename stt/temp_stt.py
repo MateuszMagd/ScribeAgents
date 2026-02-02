@@ -7,9 +7,9 @@ from utils.text import SaveText
 import librosa
 
 class SimpleSTT:
-    def __init__(self):
+    def __init__(self, file_path: str = "transcriptions.txt"):
         self.whisper = WhisperEngine("small", language="pl", task="transcribe")
-        self.save_text = SaveText("transcriptions.txt")
+        self.save_text = SaveText(file_path)
         self.buffer = []
         self.silence_frames = 0
         self.min_silence_frames = 20  # ~500 ms
