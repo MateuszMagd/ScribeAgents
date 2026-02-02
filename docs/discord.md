@@ -8,7 +8,7 @@ This is a temporary solution and may be replaced by a more advanced audio proces
 ## How to start?
 
 1. Create a Discord application and bot  
-   Go to https://discord.com/developers/applications and create a new application.  
+   Go to <https://discord.com/developers/applications> and create a new application.  
    Enable the Bot feature and copy the bot token.
 
 2. Configure environment variables  
