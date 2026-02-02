@@ -28,12 +28,6 @@ def main():
     if args.platform_name == "discord":
         from bot.discord.client import create_discord_bot, run_discord_bot
         
-        threading.Thread(
-            target=run_stt,
-            args=(audio_generator(), handle_transcript),
-            daemon=True
-        ).start()
-        
         bot = create_discord_bot()
         run_discord_bot(bot, args.save_audio)
 
