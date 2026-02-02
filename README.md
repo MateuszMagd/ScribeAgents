@@ -1,61 +1,78 @@
-# ScribeAgents - What is that?
+# ScribeAgents — What is it?
 
-This project aims to build an AI Scribe that listens to conversations on a channel and automatically creates a text file containing the full dialogue from a session. The generated transcript can later be reviewed, edited, annotated, or used to refine important parts of the conversation.
+ScribeAgents is a project focused on building an AI Scribe that listens to conversations on a channel and automatically generates a text file containing the complete dialogue from a session. The resulting transcript can be reviewed later, edited, annotated, or used to refine and extract important parts of the conversation.
 
 ## Setup
 
 ## Prerequisites
 
 - Python 3.10+
-- Discord Bot Token ([How to get one](https://discord.com/developers/applications))
+- Discord Bot Token (<https://discord.com/developers/applications>)
 
-## Installation
+## Installation (basic)
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/MateuszMagd/ScribeAgents.git
-cd ScribeAgents
+    git clone https://github.com/MateuszMagd/ScribeAgents.git
+    cd ScribeAgents
 ```
 
-2. Create and activate virtual environment:
+2. Create and activate a virtual environment:
 
 ```bash
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# Linux/Mac
-source .venv/bin/activate
+    python -m venv .venv
+
+    # Windows:
+    .venv\Scripts\activate
+
+    # Linux / macOS:
+    source .venv/bin/activate
 ```
 
 3. Install dependencies:
 
 ```bash
-pip install -r requirements.txt
+    pip install -r requirements.txt
 ```
 
 4. Configure environment variables:
 
+Edit the .env file and add your Discord bot token.
+
 ```bash
-# Copy the example file
-cp .env.example .env
-# Edit .env and add your Discord bot token
+    cp .env.example .env
 ```
 
 5. Run the bot:
 
 ```bash
-python main.py --platform_name discord --save_audio
+    python main.py --platform_name discord --save_audio
 ```
 
-## Flags
+## Running Bots
 
---platform_name - This flag run corresponding to platform_name bot - for example discord run discord bot.
-Current options:
+Each platform has its own documentation available in the /docs directory.
 
-1. discord
+- Discord: ./docs/discord.md
 
---save_audio - saves audio file.
+## Command-line Flags
+
+--platform_name  
+Specifies which platform bot should be launched.
+
+Currently supported platforms:
+- discord
+
+Example:
+
+```bash
+    python main.py --platform_name discord
+```
+
+--save_audio  
+Enables saving the raw audio from the session to a file.
+
 
 ## Roadmap
 
