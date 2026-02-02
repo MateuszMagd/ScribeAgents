@@ -1,7 +1,5 @@
 import numpy as np
 
-from stt.vad import VoiceActivityDetector
-from stt.chunker import AudioChunker
 from stt.whisper_engine import WhisperEngine
 from utils.text import SaveText
 import librosa
