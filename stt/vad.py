@@ -3,7 +3,7 @@ import torch
 import numpy as np
 
 class VoiceActivityDetector:
-    def __init__(self, sample_rate=16000, threshold=0.5):
+    def __init__(self, sample_rate=16000, threshold=0.2):
         self.model, _ = torch.hub.load(
             repo_or_dir="snakers4/silero-vad",
             model="silero_vad",

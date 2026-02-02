@@ -1,8 +1,10 @@
-import discord
-from discord.ext import commands
-from discord.sinks import WaveSink
 import os
 import asyncio
+import discord
+from discord.ext import commands
+from discord.sinks import WaveSink # TODO: remove if not needed
+from bot.discord.sink import PCMSink
+from stt.audio_queue import audio_queue
 
 class DiscordVoice(commands.Cog):
     def __init__(self, bot: commands.Bot, save_audio: bool):
@@ -30,11 +32,11 @@ class DiscordVoice(commands.Cog):
             return
 
         await ctx.send("🎙️ Bot dołączył do kanału voice.")
-
+        
     @commands.command()
     async def record(self, ctx):
         if self.is_recording:
-            await ctx.send("⚠️ Nagrywanie już trwa.")
+            await ctx.send("⚠️ Realtime STT już działa.")
             return
 
         vc = ctx.voice_client
@@ -42,23 +44,17 @@ class DiscordVoice(commands.Cog):
             await ctx.send("❌ Bot nie jest na kanale voice.")
             return
 
-        sink = WaveSink()
-        vc.start_recording(sink, self.finished_callback, ctx)
+        sink = PCMSink()
+        vc.start_recording(sink, self._noop_finished_callback)
+
 
         self.is_recording = True
-        await ctx.send("🔴 Nagrywanie rozpoczęte.")
+        await ctx.send("🎙️ Realtime STT started.")
 
-    async def finished_callback(self, sink, ctx):
-        os.makedirs("recordings", exist_ok=True)
+    async def _noop_finished_callback(self, sink, ctx):
+        # Realtime mode: nothing to do here
+        pass
 
-        for user_id, audio in sink.audio_data.items():
-            if self.save_audio:
-                with open(f"recordings/{user_id}.wav", "wb") as f:
-                    print(f"💾 Zapisano nagranie użytkownika {user_id} do recordings/{user_id}.wav")
-                    f.write(audio.file.read())
-
-        self.is_recording = False
-        await ctx.send("⏹️ Nagrywanie zakończone.")
 
     @commands.command()
     async def stop(self, ctx):
@@ -68,17 +64,22 @@ class DiscordVoice(commands.Cog):
             return
 
         vc.stop_recording()
-        await ctx.send("⏹️ Nagrywanie zatrzymane.")
+        self.is_recording = False
+        await ctx.send("⏹️ Realtime STT stopped.")
+
 
     @commands.command()
     async def leave(self, ctx):
         vc = ctx.voice_client
-        if not vc:
-            await ctx.send("❌ Bot nie jest na kanale voice.")
-            return
+        if vc:
+            if self.is_recording:
+                vc.stop_recording()
+                self.is_recording = False
 
-        await vc.disconnect()
+            await vc.disconnect()
+
         await ctx.send("👋 Bot opuścił kanał voice.")
+
 
 
 def setup(bot: commands.Bot, save_audio: bool):
