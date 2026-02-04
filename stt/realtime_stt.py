@@ -4,7 +4,7 @@ from stt.vad import VoiceActivityDetector
 from stt.chunker import AudioChunker
 from stt.whisper_engine import WhisperEngine
 from stt.audio_source import wav_frames # TODO: used?
-from utils.text import SaveText # TODO: used?
+from utils.transcript import SaveText # TODO: used?
 
 def run_stt(audio_source, on_text):
     vad = VoiceActivityDetector()

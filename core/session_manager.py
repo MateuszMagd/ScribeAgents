@@ -1,7 +1,11 @@
-from schemas.user import User
 from datetime import datetime
 
-class SessionMenager:
+from schemas.user import User
+from schemas.session_meta import SessionMeta
+from core.audio import AudioWriter
+
+
+class SessionManager:
     def __init__(self):
         pass
     
@@ -21,6 +25,9 @@ class SessionMenager:
         """Append a transcript to the user's session."""
         pass
     
+    def append_audio(self, user_id: int, audio_data: bytes) -> None:
+        """Append audio data to the user's session."""
+        pass
     def finalize(self) -> None:
         """Finalize and save the session data."""
         pass

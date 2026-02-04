@@ -1,7 +1,7 @@
 import numpy as np
 
 from stt.whisper_engine import WhisperEngine
-from utils.text import SaveText
+from utils.transcript import SaveText
 import librosa
 
 class SimpleSTT:

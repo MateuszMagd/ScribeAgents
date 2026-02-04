@@ -5,7 +5,7 @@ from constants import AVAILABLE_PLATFORM_LIST
 from stt.realtime_stt import run_stt
 from stt.audio_queue import audio_generator
 
-from utils.text import SaveText
+from utils.transcript import SaveText
 
 text_saver = SaveText("text_files/transcriptions.txt")
 
