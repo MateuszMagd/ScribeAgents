@@ -9,10 +9,13 @@ from schemas.user import User
 
 class TranscriptWriter:
     def __init__(self,
-                 base_dir: Path = FOLDER_TEXT_FILES,
-                 user: User = None,
-                 session_id: str = None):
+        base_dir: Path = FOLDER_TEXT_FILES,
+        user: User = None,
+        session_id: str = None
+    ):
+        self.base_dir: Path = base_dir
         self.user: User = user
+        self.session_id: str = session_id
         self.file_path: Path = self._build_filename(user.id) if user and session_id else None
         
         if not self.file_path:
