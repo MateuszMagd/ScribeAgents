@@ -81,11 +81,11 @@ The goal of this stage is to validate whether the idea is technically feasible, 
 
 This stage focuses on:
 
-- early experiments,
+- early experiments, ✅
 
-- proof-of-concept implementations,
+- proof-of-concept implementations, ✅
 
-- minimal, often non-production-ready code.
+- minimal, often non-production-ready code. ✅
 
 The scope is intentionally limited and not fully designed.
 
@@ -182,7 +182,7 @@ Responsibilities:
 
 - optional session-scoped logs.
 
-Testing Requirements
+#### Testing Requirements
 
 All core components must include tests:
 

@@ -1,10 +1,35 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel
+from typing import List, Optional
+from enum import Enum
+
+class Platoform(str, Enum):
+    DISCORD = "discord"
+    TEAMSPEAK = "teamspeak"
+
+class ChannelType(str, Enum):
+    VOICE = "voice"
+    TEXT = "text"
+    STAGE = "stage"
+    UNKNOWN = "unknown"
+class Channel(BaseModel):
+    id: int
+    name: Optional[str]
+    type: ChannelType
+    platform: Optional[Platoform] = None
+    
+class VoiceState(BaseModel):
+    channel: Optional[Channel]
+    self_mute: Optional[bool]
+    self_deaf: Optional[bool]
+    mute: Optional[bool]
+    deaf: Optional[bool]
 
 class User(BaseModel):
-    id: int = Field(..., description="The unique identifier for the user")
-    displayname: str = Field(... , max_length=100, description="The full name of the user")
-    username: Optional[str] = Field(None, min_length=3, max_length=50, description="The username of the user")
-    
-    
+    id: int
+    name: str
+    display_name: Optional[str]
+    bot: bool
+    roles: List[str]
+    joined_at: str
+    voice: Optional[VoiceState]
     
