@@ -20,12 +20,12 @@ def create_discord_bot() -> commands.Bot:
     return bot
 
 
-def run_discord_bot(bot: commands.Bot, save_audio: bool):
-    setup(bot, save_audio)
+def run_discord_bot(bot: commands.Bot, save_audio: bool, manager):
+    setup(bot, save_audio, manager)
 
     @bot.event
     async def on_ready():
-        print(f"🤖 Discord bot zalogowany jako {bot.user}")
+        print(f"Bot logged in as {bot.user}")
 
     TOKEN = os.getenv("TOKEN")
     bot.run(TOKEN)
