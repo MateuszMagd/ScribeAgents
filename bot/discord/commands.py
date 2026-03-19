@@ -5,8 +5,11 @@ from discord.ext import commands
 
 from bot.discord.sink import PCMSink
 from core.adapters.discord import DiscordAdapter
+from core.logging.logger import get_logger
 from core.session.manager import SessionMenager
 from schemas.user import User
+
+_log = get_logger(__name__)
 
 
 class DiscordVoice(commands.Cog):
@@ -35,6 +38,7 @@ class DiscordVoice(commands.Cog):
             await ctx.send("❌ Failed to connect to the voice channel.")
             return
 
+        _log.info("Joined voice channel: %s", ctx.author.voice.channel.name)
         await ctx.send("🎙️ Joined the voice channel.")
 
     @commands.command()
@@ -64,6 +68,7 @@ class DiscordVoice(commands.Cog):
         self._adapter = DiscordAdapter(vc, self.manager, sink)
         await self._adapter.start_listening()
         self.is_recording = True
+        _log.info("Recording started in channel: %s", ctx.author.voice.channel.name)
         await ctx.send("🎙️ Recording started.")
 
     @commands.command()
@@ -76,6 +81,7 @@ class DiscordVoice(commands.Cog):
         self.manager.finalize()
         self.is_recording = False
         self._adapter = None
+        _log.info("Recording stopped by user: %s", ctx.author.name)
         await ctx.send("⏹️ Recording stopped. Transcript saved.")
 
     @commands.command()

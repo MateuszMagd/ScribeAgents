@@ -4,8 +4,11 @@ from pathlib import Path
 import numpy as np
 
 from constants import FOLDER_TEXT_FILES
+from core.logging.logger import get_logger
 from schemas.user import User
 from core.audio.audio_to_text import audio_to_text
+
+_log = get_logger(__name__)
 
 
 class SessionMenager:
@@ -16,6 +19,7 @@ class SessionMenager:
     def create_session(self, user_data: User):
         """Register a user for the current recording session."""
         self.sessions[user_data.id] = user_data
+        _log.info("Session created for user %s (id=%d)", user_data.name, user_data.id)
 
     def get_session(self, session_id: int) -> User | None:
         """Return user data for the given session id, or None."""
@@ -25,6 +29,7 @@ class SessionMenager:
         """Remove a user from the active sessions."""
         if session_id in self.sessions:
             del self.sessions[session_id]
+            _log.debug("Session deleted for user id=%d", session_id)
 
     def handle_audio(
         self,
@@ -40,8 +45,10 @@ class SessionMenager:
 
         text = audio_to_text(audio, sample_rate)
         if not text:
+            _log.debug("Empty transcription for user id=%d — skipping", user_id)
             return
 
+        _log.debug("Transcribed for user id=%d: %s", user_id, text)
         entry = {
             "user_id": user_id,
             "username": user.display_name or user.name,
@@ -76,4 +83,5 @@ class SessionMenager:
         with open(FOLDER_TEXT_FILES / filename, "w", encoding="utf-8") as f:
             f.write(transcript)
 
+        _log.info("Transcript saved: %s", filename)
         return transcript

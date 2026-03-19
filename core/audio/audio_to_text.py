@@ -3,7 +3,9 @@ import whisper
 
 from core.audio.preprocessing import preprocess_audio, WHISPER_SAMPLE_RATE
 from core.audio.postprocessing import postprocess_text
+from core.logging.logger import get_logger
 
+_log = get_logger(__name__)
 _model: whisper.Whisper | None = None
 _loaded_model_name: str | None = None
 
@@ -12,8 +14,10 @@ def _get_model(model_name: str = "base") -> whisper.Whisper:
     """Return a cached Whisper model, loading it on first call."""
     global _model, _loaded_model_name
     if _model is None or _loaded_model_name != model_name:
+        _log.info("Loading Whisper model: %s", model_name)
         _model = whisper.load_model(model_name)
         _loaded_model_name = model_name
+        _log.info("Whisper model '%s' loaded", model_name)
     return _model
 
 
