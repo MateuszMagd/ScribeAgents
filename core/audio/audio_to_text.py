@@ -21,7 +21,7 @@ def audio_to_text(
     audio: np.ndarray,
     sample_rate: int,
     model_name: str = "base",
-    language: str | None = None,
+    language: str | None = "pl",
 ) -> str:
     """Convert audio to text using OpenAI Whisper.
 

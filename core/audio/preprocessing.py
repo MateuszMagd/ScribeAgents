@@ -216,4 +216,4 @@ def preprocess_audio(
     audio = normalize_amplitude(audio)
     audio = resample(audio, sample_rate, target_sample_rate)
 
-    return audio_
+    return audio
