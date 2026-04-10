@@ -6,12 +6,8 @@ DISCORD_SAMPLE_RATE = 48000
 WHISPER_SAMPLE_RATE = 16000
 
 
-# ---------------------------------------------------------------------------
-# Filters
-# ---------------------------------------------------------------------------
-
 def apply_pre_emphasis(audio: np.ndarray, coeff: float = 0.97) -> np.ndarray:
-    """Optional pre-emphasis filter."""
+    """Apply pre-emphasis filter to boost high frequencies."""
     return np.append(audio[0], audio[1:] - coeff * audio[:-1]).astype(np.float32)
 
 
@@ -32,10 +28,6 @@ def bandpass_filter(
     return signal.sosfilt(sos, audio).astype(np.float32)
 
 
-# ---------------------------------------------------------------------------
-# Noise Reduction (improved)
-# ---------------------------------------------------------------------------
-
 def reduce_noise(
     audio: np.ndarray,
     sample_rate: int = DISCORD_SAMPLE_RATE,
@@ -43,10 +35,7 @@ def reduce_noise(
     over_subtraction: float = 1.5,
     spectral_floor: float = 0.02,
 ) -> np.ndarray:
-    """
-    Spectral subtraction with adaptive noise estimation
-    (uses lowest-energy frames instead of assuming silence at start).
-    """
+    """Reduce noise via spectral subtraction with adaptive noise estimation."""
     hop_length = n_fft // 2
 
     _, _, Zxx = signal.stft(
@@ -59,12 +48,10 @@ def reduce_noise(
     magnitude = np.abs(Zxx)
     phase = np.angle(Zxx)
 
-    # --- estimate noise from lowest-energy frames ---
     frame_energy = np.mean(magnitude, axis=0)
     noise_frames = np.argsort(frame_energy)[: max(1, len(frame_energy) // 10)]
     noise_profile = np.mean(magnitude[:, noise_frames], axis=1, keepdims=True)
 
-    # --- subtraction ---
     magnitude_clean = np.maximum(
         magnitude - over_subtraction * noise_profile,
         spectral_floor * magnitude,
@@ -80,15 +67,12 @@ def reduce_noise(
     return audio_clean[: len(audio)].astype(np.float32)
 
 
-# ---------------------------------------------------------------------------
-# Utility
-# ---------------------------------------------------------------------------
-
 def normalize_amplitude(
     audio: np.ndarray,
     target_rms: float = 0.1,
     min_rms: float = 1e-6,
 ) -> np.ndarray:
+    """Normalize audio amplitude to a target RMS level."""
     rms = np.sqrt(np.mean(audio**2))
     if rms < min_rms:
         return audio
@@ -101,6 +85,7 @@ def trim_silence(
     frame_length: int = 2048,
     hop_length: int = 512,
 ) -> np.ndarray:
+    """Trim leading and trailing silence."""
     trimmed, _ = librosa.effects.trim(
         audio,
         top_db=threshold_db,
@@ -115,6 +100,7 @@ def resample(
     original_rate: int,
     target_rate: int,
 ) -> np.ndarray:
+    """Resample audio to a different sample rate."""
     if original_rate == target_rate:
         return audio
     return librosa.resample(audio, orig_sr=original_rate, target_sr=target_rate).astype(
@@ -122,28 +108,13 @@ def resample(
     )
 
 
-# ---------------------------------------------------------------------------
-# Main pipeline
-# ---------------------------------------------------------------------------
-
 def preprocess_audio(
     audio: np.ndarray,
     sample_rate: int = DISCORD_SAMPLE_RATE,
     target_sample_rate: int = WHISPER_SAMPLE_RATE,
     use_pre_emphasis: bool = False,
 ) -> np.ndarray:
-    """
-    Improved preprocessing pipeline for STT.
-
-    Order:
-        1. Trim silence
-        2. Band-pass filter
-        3. Noise reduction
-        4. Normalize
-        5. (Optional) Pre-emphasis
-        6. Resample
-    """
-
+    """Run the full audio preprocessing pipeline: trim, bandpass, denoise, normalize, resample."""
     if len(audio) == 0:
         return audio
 

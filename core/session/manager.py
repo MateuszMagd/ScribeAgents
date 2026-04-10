@@ -19,12 +19,10 @@ class SessionMenager:
 
     def create_session(self, user_data: User):
         """Register a user for the current recording session."""
-        
         transcript_for_user = Transcript(
             path=FOLDER_TEXT_FILES,
             file_name=f"{user_data.name}.{user_data.id}.txt",
         )
-        
         self.sessions[user_data.id] = (user_data, transcript_for_user)
         _log.info("Session created for user %s (id=%d)", user_data.name, user_data.id)
 
@@ -59,3 +57,16 @@ class SessionMenager:
         _log.debug("Transcribed for user id=%d: %s", user_id, text)
 
         transcript.add_entry(user.display_name or user.name, text)
+
+    def get_transcript_path(self, session_id: int):
+        """Return the transcript file path for the given session id, or None."""
+        session = self.get_session(session_id)
+        if session is None:
+            return None
+        _, transcript = session
+        return transcript.path
+
+    def finalize(self):
+        """Close all active sessions and log completion."""
+        _log.info("Finalizing session with %d user(s)", len(self.sessions))
+        self.sessions.clear()

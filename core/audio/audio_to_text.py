@@ -27,22 +27,7 @@ def audio_to_text(
     model_name: str = "base",
     language: str | None = "pl",
 ) -> str:
-    """Convert audio to text using faster-whisper.
-
-    The function preprocesses the raw audio (noise reduction, normalisation,
-    resampling to 16 000 Hz) and then runs Whisper transcription.
-
-    Args:
-        audio:       Mono float32 signal in [-1.0, 1.0].
-        sample_rate: Sample rate of the input signal in Hz.
-        model_name:  Whisper model size: "tiny", "base", "small", "medium",
-                     "large".  Larger models are more accurate but slower.
-        language:    BCP-47 language code (e.g. "pl", "en") or None to let
-                     Whisper auto-detect the language.
-
-    Returns:
-        Transcribed text string (may be empty for silent input).
-    """
+    """Preprocess audio and transcribe it using faster-whisper. Returns empty string for silent input."""
     if len(audio) == 0:
         return ""
 

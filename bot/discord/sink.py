@@ -1,5 +1,3 @@
-import datetime
-
 import numpy as np
 from discord.sinks.core import Sink
 
@@ -18,4 +16,4 @@ class PCMSink(Sink):
         samples = np.frombuffer(data, dtype=np.int16).astype(np.float32)
         samples /= 32768.0
         samples = samples.reshape(-1, 2).mean(axis=1)
-        self.manager.handle_audio(user.id, samples, DISCORD_SAMPLE_RATE, datetime.datetime.now())
+        self.manager.handle_audio(user.id, samples, DISCORD_SAMPLE_RATE)

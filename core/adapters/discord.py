@@ -2,8 +2,9 @@ from core.adapters.basic import PlatformAdapter
 
 
 class DiscordAdapter(PlatformAdapter):
+    """Manages recording lifecycle for a Discord voice channel."""
+
     def __init__(self, voice_client, manager, sink):
-        """Manages recording lifecycle for a Discord voice channel."""
         self.voice_client = voice_client
         self.manager = manager
         self._sink = sink
