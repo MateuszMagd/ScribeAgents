@@ -1,12 +1,17 @@
+import numpy as np
+
 from core.adapters.basic import PlatformAdapter
+from core.audio.preprocessing import DISCORD_SAMPLE_RATE
+from core.session.manager import SessionMenager
+from discord.voice_client import VoiceClient
 
 
 class DiscordAdapter(PlatformAdapter):
     """Manages recording lifecycle for a Discord voice channel."""
 
-    def __init__(self, voice_client, manager, sink):
-        self.voice_client = voice_client
-        self.manager = manager
+    def __init__(self, voice_client: VoiceClient, manager: SessionMenager, sink):
+        self.voice_client: VoiceClient = voice_client
+        self.manager: SessionMenager = manager
         self._sink = sink
 
     async def start_listening(self):
