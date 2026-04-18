@@ -2,7 +2,6 @@ from argparse import ArgumentParser
 
 from constants import AVAILABLE_PLATFORM_LIST
 from core.logging.logger import setup_logging, get_logger
-from core.session.manager import SessionMenager
 
 setup_logging()
 _log = get_logger(__name__)
@@ -15,12 +14,12 @@ def main():
     args = parser.parse_args()
 
     _log.info("Starting ScribeAgents on platform: %s", args.platform_name)
-    manager = SessionMenager()
 
     if args.platform_name == "discord":
         from bot.discord.client import create_discord_bot, run_discord_bot
         bot = create_discord_bot()
-        run_discord_bot(bot, args.save_audio, manager)
+        
+        run_discord_bot(bot, args.save_audio)
 
 
 if __name__ == '__main__':

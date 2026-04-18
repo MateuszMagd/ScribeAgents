@@ -4,19 +4,22 @@ import discord
 from discord.ext import commands
 
 from core.adapters.basic import PlatformAdapter
+from core.adapters.discord import DiscordAdapter
 from core.logging.logger import get_logger
 from core.session.manager import SessionMenager
+from bot.discord.sink import PCMSink
 from schemas.user import User
 
 _log = get_logger(__name__)
 
 
 class DiscordVoice(commands.Cog):
-    def __init__(self, bot: commands.Bot, save_audio: bool, adapter: PlatformAdapter):
+    def __init__(self, bot: commands.Bot, save_audio: bool, manager: SessionMenager):
         self.bot: commands.Bot = bot
         self.save_audio: bool = save_audio
         self.is_recording: bool = False
-        self._adapter: PlatformAdapter | None = adapter
+        self.manager: SessionMenager = manager
+        self._adapter: PlatformAdapter | None = None
 
     @commands.command()
     async def join(self, ctx):
@@ -52,6 +55,10 @@ class DiscordVoice(commands.Cog):
             await ctx.send("❌ Bot is not in a voice channel.")
             return
 
+        if not ctx.author.voice or not ctx.author.voice.channel:
+            await ctx.send("❌ You are not in a voice channel.")
+            return
+
         for member in ctx.author.voice.channel.members:
             if not member.bot:
                 user = User(
@@ -64,6 +71,8 @@ class DiscordVoice(commands.Cog):
                 )
                 self.manager.create_session(user)
 
+        sink = PCMSink(self.manager)
+        self._adapter = DiscordAdapter(vc, self.manager, sink)
         await self._adapter.start_listening()
         self.is_recording = True
         _log.info("Recording started in channel: %s", ctx.author.voice.channel.name)
@@ -99,16 +108,28 @@ class DiscordVoice(commands.Cog):
     @commands.command()
     async def show_sessions(self, ctx):
         '''Show active recording sessions.'''
-        sessions = self.manager.list_sessions()
+        sessions = list(self.manager.sessions.values())
         if not sessions:
             await ctx.send("📭 No active sessions.")
             return
 
         msg = "📋 Active Sessions:\n"
-        for session in sessions:
-            msg += f"- {session.user.display_name} (ID: {session.user.id})\n"
+        for user, _ in sessions:
+            msg += f"- {user.display_name} (ID: {user.id})\n"
         await ctx.send(msg)
 
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        _log.error(
+            "Command '%s' raised an error: %s",
+            ctx.command,
+            error,
+            exc_info=error,
+        )
+        await ctx.send(f"❌ Error: {error}")
 
-def setup(bot: commands.Bot, save_audio: bool, adapter: PlatformAdapter):
-    bot.add_cog(DiscordVoice(bot, save_audio, adapter))
+
+def setup(bot: commands.Bot, save_audio: bool):
+    """Register the DiscordVoice cog and initialize the session manager."""
+    manager = SessionMenager()
+    bot.add_cog(DiscordVoice(bot, save_audio, manager))

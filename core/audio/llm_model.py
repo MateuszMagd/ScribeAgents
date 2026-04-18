@@ -4,23 +4,31 @@ import torch
 from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-
-
 load_dotenv()
 
 MODEL_NAME = "Qwen/Qwen3.5-4B"
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+_tokenizer = None
+_model = None
 
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_NAME,
-    token=HF_TOKEN,
-    dtype=torch.float16,
-    device_map="auto"
-)
+
+def _get_model():
+    """Load and cache the Qwen model and tokenizer on first call."""
+    global _tokenizer, _model
+    if _model is None:
+        _tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+        _model = AutoModelForCausalLM.from_pretrained(
+            MODEL_NAME,
+            token=HF_TOKEN,
+            torch_dtype=torch.float16,
+            device_map="auto",
+        )
+    return _tokenizer, _model
+
 
 def ask_qwen(prompt: str) -> str:
+    tokenizer, model = _get_model()
     messages = [{"role": "user", "content": prompt}]
     text = tokenizer.apply_chat_template(
         messages,

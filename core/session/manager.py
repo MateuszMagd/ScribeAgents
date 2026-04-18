@@ -16,6 +16,8 @@ class SessionMenager:
     def __init__(self):
         self.sessions: dict[int, tuple[User, Transcript]] = {}
         self._entries: list[dict] = []
+        self._audio_buffers: dict[int, list[np.ndarray]] = {}
+        self._buffer_sample_rates: dict[int, int] = {}
 
     def create_session(self, user_data: User):
         """Register a user for the current recording session."""
@@ -58,6 +60,35 @@ class SessionMenager:
 
         transcript.add_entry(user.display_name or user.name, text)
 
+    def buffer_audio(self, user_id: int, samples: np.ndarray, sample_rate: int):
+        """Accumulate audio samples for a user to be transcribed on finalize."""
+        if user_id not in self.sessions:
+            return
+        if user_id not in self._audio_buffers:
+            self._audio_buffers[user_id] = []
+            self._buffer_sample_rates[user_id] = sample_rate
+        self._audio_buffers[user_id].append(samples)
+
+    def flush_buffers(self):
+        """Transcribe all buffered audio and append results to transcripts."""
+        for user_id, chunks in self._audio_buffers.items():
+            if not chunks:
+                continue
+            session = self.get_session(user_id)
+            if session is None:
+                continue
+            user, transcript = session
+            audio = np.concatenate(chunks)
+            sample_rate = self._buffer_sample_rates.get(user_id, 48000)
+            text = audio_to_text(audio, sample_rate)
+            if text:
+                transcript.add_entry(user.display_name or user.name, text)
+                _log.debug("Transcribed for user id=%d: %s", user_id, text)
+            else:
+                _log.debug("Empty transcription for user id=%d — skipping", user_id)
+        self._audio_buffers.clear()
+        self._buffer_sample_rates.clear()
+
     def get_transcript_path(self, session_id: int):
         """Return the transcript file path for the given session id, or None."""
         session = self.get_session(session_id)
@@ -67,6 +98,7 @@ class SessionMenager:
         return transcript.path
 
     def finalize(self):
-        """Close all active sessions and log completion."""
+        """Flush buffered audio, close all active sessions and log completion."""
         _log.info("Finalizing session with %d user(s)", len(self.sessions))
+        self.flush_buffers()
         self.sessions.clear()

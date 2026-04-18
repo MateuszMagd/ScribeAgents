@@ -1,4 +1,5 @@
 import os
+import sys
 import discord
 import asyncio
 
@@ -12,6 +13,9 @@ load_dotenv()
 
 _log = get_logger(__name__)
 
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 def create_discord_bot() -> commands.Bot:
     asyncio.set_event_loop(asyncio.new_event_loop())
 
@@ -22,9 +26,8 @@ def create_discord_bot() -> commands.Bot:
     bot = commands.Bot(command_prefix="!", intents=intents)
     return bot
 
-
-def run_discord_bot(bot: commands.Bot, save_audio: bool, manager):
-    setup(bot, save_audio, manager)
+def run_discord_bot(bot: commands.Bot, save_audio: bool):
+    setup(bot, save_audio)
 
     @bot.event
     async def on_ready():
